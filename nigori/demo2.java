@@ -23,13 +23,14 @@ class MyView extends JFrame {
     private JPanel currentPanel;
 
     public MyView() {
-        this.setTitle("MVC Example");
-        this.setSize(400, 300);
+        this.setTitle("Tower Deffence");
+        this.setSize(1000, 1000);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(new BorderLayout());
+        this.setLayout(new GridLayout(2,1));
 
         currentPanel = new JPanel();
         currentPanel.add(new JLabel("Main Screen"));
+        currentPanel.add(new JButton("Start"));
         this.add(currentPanel, BorderLayout.CENTER);
 
         this.setVisible(true);
@@ -40,7 +41,8 @@ class MyView extends JFrame {
 
         if ("mainScreen".equals(screenState)) {
             currentPanel = new JPanel();
-            currentPanel.add(new JLabel("Main Screen"));
+            currentPanel.add(new JLabel("Tower Deffence"));
+            currentPanel.add(new JButton("Start"));
         } else if ("nextScreen".equals(screenState)) {
             currentPanel = new JPanel();
             currentPanel.add(new JLabel("Next Screen"));
