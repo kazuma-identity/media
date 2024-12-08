@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
+import java.util.*;
 
 class MyModel {
     private String screenState;
@@ -26,12 +26,11 @@ class MyView extends JFrame {
         this.setTitle("Tower Deffence");
         this.setSize(1000, 1000);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(new GridLayout(2,1));
 
         currentPanel = new JPanel();
+        currentPanel.setLayout(new GridLayout(2,1));
         currentPanel.add(new JLabel("Main Screen"));
         currentPanel.add(new JButton("Start"));
-        this.add(currentPanel, BorderLayout.CENTER);
 
         this.setVisible(true);
     }
@@ -41,6 +40,7 @@ class MyView extends JFrame {
 
         if ("mainScreen".equals(screenState)) {
             currentPanel = new JPanel();
+            currentPanel.setLayout(new GridLayout(2,1));
             currentPanel.add(new JLabel("Tower Deffence"));
             currentPanel.add(new JButton("Start"));
         } else if ("nextScreen".equals(screenState)) {
@@ -57,7 +57,7 @@ class MyView extends JFrame {
     }
 }
 
-class MyController {
+class MyController implements ActionListener{
     private MyModel model;
     private MyView view;
 
