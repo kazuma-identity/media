@@ -57,7 +57,7 @@ class MyView extends JFrame {
     }
 }
 
-class MyController implements ActionListener{
+class MyController {
     private MyModel model;
     private MyView view;
 
