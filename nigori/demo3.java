@@ -77,6 +77,7 @@ class DrawModel extends Observable {
     protected Figure drawingFigure;
     protected Color currentColor;
     protected boolean Castle;
+    protected Figure lastCircle;
 
     public DrawModel() {
         fig = new ArrayList<>();
@@ -118,6 +119,20 @@ class DrawModel extends Observable {
         notifyObservers();
     }
 
+    public void removeFigure(Figure figure) {
+        if (fig.remove(figure)) { // リストから削除
+            setChanged(); // モデルが変更されたことを通知
+            notifyObservers(); // ビューを更新
+        }
+    }
+
+    // すべての図形を削除するメソッド
+    public void clearFigures() {
+        fig.clear(); // リストをクリア
+        setChanged(); // モデルが変更されたことを通知
+        notifyObservers(); // ビューを更新
+    }
+
     public void reshapeFigure(int x1, int y1, int x2, int y2) {
         if (drawingFigure != null) {
             drawingFigure.reshape(x1, y1, x2, y2);
@@ -126,21 +141,69 @@ class DrawModel extends Observable {
         }
     }
 
+    public boolean checkCollisionAndRemoveC(Figure circle) {
+        Iterator<Figure> iterator = fig.iterator();
+        boolean collisionDetected = false;
+        while (iterator.hasNext()) {
+            Figure f = iterator.next();
+
+            // 円と他の図形が接触しているかを判定
+            if (isTouching(circle, f)) {
+                iterator.remove(); // 図形を削除
+                removeFigure(circle); // 円を削除
+                collisionDetected = true;
+            }
+        }
+        if (collisionDetected) {
+            removeFigure(circle);
+        }
+        return collisionDetected; 
+    }
+
+    // 円と図形の接触判定
+    private boolean isTouching(Figure circle, Figure other) {
+        int circleCenterX = circle.x + circle.width / 2;
+        int circleCenterY = circle.y + circle.height / 2;
+        int radius = circle.width / 2;
+
+        // 他の図形の境界を計算
+        int otherLeft = other.x;
+        int otherRight = other.x + other.width;
+        int otherTop = other.y;
+        int otherBottom = other.y + other.height;
+
+        // 円の中心が他の図形の境界内にあるかチェック
+        boolean isTouchingX = circleCenterX + radius > otherLeft && circleCenterX - radius < otherRight;
+        boolean isTouchingY = circleCenterY + radius > otherTop && circleCenterY - radius < otherBottom;
+
+        return isTouchingX && isTouchingY;
+    }
+
+
     public void addMovingCircle() {
-        javax.swing.Timer timer = new javax.swing.Timer(1000, new ActionListener() { // 1000ミリ秒ごとに実行
+        javax.swing.Timer timer = new javax.swing.Timer(500, new ActionListener() { // 1000ミリ秒ごとに実行
             private int circleX = 480; // 右側の初期位置
             private final int circleY = 240; // 中心位置
-            private final int diameter = 40; // 円の直径
+            private final int diameter = 30; // 円の直径
             private final int step = 20; // 移動距離
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                if (lastCircle != null) {
+                    removeFigure(lastCircle);
+                }
                 // 新しい円を生成して左に移動させる
                 circleX -= step;
                 CircleFigure circle = new CircleFigure(circleX, circleY - diameter / 2, diameter, Color.blue);
 
-                // モデルに円を追加
-                fig.add(circle);
+                // 接触判定
+                if (!checkCollisionAndRemoveC(circle)) {
+                    fig.add(circle);
+                    lastCircle = circle;
+                } else {
+                    circleX = 480;
+                }
 
                 // 更新を通知
                 setChanged();
@@ -148,6 +211,7 @@ class DrawModel extends Observable {
 
                 // 円が画面外に出たら停止
                 if (circleX + diameter < 0) {
+                    lastCircle = null;
                     ((javax.swing.Timer) e.getSource()).stop();
                 }
             }
