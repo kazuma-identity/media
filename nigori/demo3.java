@@ -78,11 +78,12 @@ class DrawModel extends Observable {
     protected Color currentColor;
     protected boolean Castle;
     protected Figure lastCircle;
+    protected String chosenFigure;
 
     public DrawModel() {
         fig = new ArrayList<>();
         drawingFigure = null;
-        currentColor = Color.red;
+        currentColor = Color.black;
         Castle = false;
     }
 
@@ -110,8 +111,12 @@ class DrawModel extends Observable {
         Figure f;
         if (!Castle) {
             f = new FillRectFigure(x, y, 0, 0, currentColor);
+        } else if (chosenFigure == "RED") {
+            f = new RectangleFigure(x, y, 0, 0, Color.red);
+        } else if (chosenFigure == "BLUE") {
+            f = new RectangleFigure(x, y, 0, 0, Color.blue);
         } else {
-            f = new RectangleFigure(x, y, 0, 0, currentColor);
+            f = new RectangleFigure(x, y, 0, 0, Color.green);
         }
         fig.add(f);
         drawingFigure = f;
@@ -139,6 +144,10 @@ class DrawModel extends Observable {
             setChanged();
             notifyObservers();
         }
+    }
+
+    public void setDrawFigure(String f) {
+        chosenFigure = f;
     }
 
     public boolean checkCollisionAndRemoveC(Figure circle) {
@@ -181,7 +190,7 @@ class DrawModel extends Observable {
 
 
     public void addMovingCircle() {
-        javax.swing.Timer timer = new javax.swing.Timer(500, new ActionListener() { // 1000ミリ秒ごとに実行
+        javax.swing.Timer timer = new javax.swing.Timer(500, new ActionListener() { // 500ミリ秒ごとに実行
             private int circleX = 480; // 右側の初期位置
             private final int circleY = 240; // 中心位置
             private final int diameter = 30; // 円の直径
@@ -195,7 +204,7 @@ class DrawModel extends Observable {
                 }
                 // 新しい円を生成して左に移動させる
                 circleX -= step;
-                CircleFigure circle = new CircleFigure(circleX, circleY - diameter / 2, diameter, Color.blue);
+                CircleFigure circle = new CircleFigure(circleX, circleY - diameter / 2, diameter, Color.orange);
 
                 // 接触判定
                 if (!checkCollisionAndRemoveC(circle)) {
@@ -223,7 +232,7 @@ class DrawModel extends Observable {
 // --- View ---
 class ViewPanel extends JPanel implements Observer {
     protected DrawModel model;
-    protected JButton drawButton;
+    protected JButton choose1, choose2, choose3;
     protected boolean enableDrawing = false;
 
     public ViewPanel(DrawModel m, DrawController c) {
@@ -246,14 +255,37 @@ class ViewPanel extends JPanel implements Observer {
     public void update(Observable o, Object arg) {
         repaint();
 
-        if (model.isCastle() && drawButton == null) {
-            drawButton = new JButton("Put Your Deffence...");
-            drawButton.addActionListener(e -> {
+        if (model.isCastle() && choose1 == null) {
+            choose1 = new JButton("RED");
+            choose2 = new JButton("BLUE");
+            choose3 = new JButton("GREEN");
+            choose1.addActionListener(e -> {
                 enableDrawing = true; // 図形を描画するモードを有効化
-                drawButton.setEnabled(false); // ボタンを無効化
+                model.setDrawFigure("RED");
+                choose1.setEnabled(false); // ボタンを無効化
+                choose2.setEnabled(false);
+                choose3.setEnabled(false);
                 model.addMovingCircle(); // アニメーションを開始
             });
-            this.add(drawButton);
+            choose2.addActionListener(e -> {
+                enableDrawing = true; // 図形を描画するモードを有効化
+                model.setDrawFigure("BLUE");
+                choose1.setEnabled(false); // ボタンを無効化
+                choose2.setEnabled(false);
+                choose3.setEnabled(false);
+                model.addMovingCircle(); // アニメーションを開始
+            });
+            choose3.addActionListener(e -> {
+                enableDrawing = true; // 図形を描画するモードを有効化
+                model.setDrawFigure("GREEN");
+                choose1.setEnabled(false); // ボタンを無効化
+                choose2.setEnabled(false);
+                choose3.setEnabled(false);
+                model.addMovingCircle(); // アニメーションを開始
+            });
+            this.add(choose1);
+            this.add(choose2);
+            this.add(choose3);
             this.revalidate();
             this.repaint();
         }                
