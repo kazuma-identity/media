@@ -7,6 +7,7 @@ import java.util.*;
 class Figure {
     protected int x, y, width, height;
     protected Color color;
+    protected int HP;
 
     public Figure(int x, int y, int w, int h, Color c) {
         this.x = x;
@@ -14,6 +15,7 @@ class Figure {
         width = w;
         height = h;
         color = c;
+        HP = 0;
     }
 
     public void setSize(int w, int h) {
@@ -24,6 +26,18 @@ class Figure {
     public void setLocation(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+
+    public void setHP(int HP) {
+        this.HP = HP;
+    }
+
+    public int getHP() {
+        return HP;
+    }
+
+    public void reduceHP(int damage) {
+        HP -= damage;
     }
 
     public void reshape(int x1, int y1, int x2, int y2) {
@@ -87,6 +101,13 @@ class DrawModel extends Observable {
         Castle = false;
     }
 
+    public int getCastleHP() {
+        if(!fig.isEmpty()) {
+            return fig.get(0).getHP();
+        }
+        return 0;
+    }
+
     public void setCurrentColor(Color color) {
         currentColor = color;
         setChanged();
@@ -111,6 +132,7 @@ class DrawModel extends Observable {
         Figure f;
         if (!Castle) {
             f = new FillRectFigure(x, y, 0, 0, currentColor);
+            f.setHP(5);
         } else if (chosenFigure == "RED") {
             f = new RectangleFigure(x, y, 0, 0, Color.red);
         } else if (chosenFigure == "BLUE") {
@@ -158,9 +180,17 @@ class DrawModel extends Observable {
 
             // 円と他の図形が接触しているかを判定
             if (isTouching(circle, f)) {
-                iterator.remove(); // 図形を削除
-                removeFigure(circle); // 円を削除
+                if (f == fig.get(0)) { // キャッスルに衝突した場合
+                    f.reduceHP(1); // キャッスルの HP を減らす
+                    if (f.getHP() <= 0) { // HP が 0 になったらゲームオーバー
+                        setChanged();
+                        notifyObservers("GameOver");
+                    }
+                } else {
+                    iterator.remove(); // 他の図形を削除
+                }
                 collisionDetected = true;
+                break;
             }
         }
         if (collisionDetected) {
@@ -200,7 +230,6 @@ class DrawModel extends Observable {
         notifyObservers(); // モデルの変更を通知してビューを更新
     }
 
-
     public void addMovingCircle() {
         javax.swing.Timer timer = new javax.swing.Timer(500, new ActionListener() { // 500ミリ秒ごとに実行
             private int circleX = 480; // 右側の初期位置
@@ -210,36 +239,30 @@ class DrawModel extends Observable {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
                 if (lastCircle != null) {
                     removeFigure(lastCircle);
                 }
+
                 // 新しい円を生成して左に移動させる
                 circleX -= step;
                 CircleFigure circle = new CircleFigure(circleX, circleY - diameter / 2, diameter, Color.orange);
 
-                // 接触判定（最初の黒い四角形とのみ判定）
-                if (!fig.isEmpty() && isTouching(circle, fig.get(0))) { // 最初の図形と接触を確認
-                    checkCollisionAndRemoveC(circle);
-                    ((javax.swing.Timer) e.getSource()).stop(); // タイマーを停止
-                    setChanged();
-                    notifyObservers("GameOver"); // 衝突時に "GameOver" を通知
-                    return;
-                }
-
-                // 接触判定
-                if (!checkCollisionAndRemoveC(circle)) {
-                    fig.add(circle);
-                    lastCircle = circle;
+                // 接触判定（キャッスルを含む全図形との衝突判定）
+                if (checkCollisionAndRemoveC(circle)) {
+                    // 衝突してもゲームが継続する場合はリセットせず、次の円を生成
+                    if (getCastleHP() > 0) {
+                        circleX = 480; // 新しい円の初期位置を設定
+                    } else {
+                        ((javax.swing.Timer) e.getSource()).stop(); // HPが0でタイマーを停止
+                    }
                 } else {
-                    circleX = 480;
+                    fig.add(circle); // 新しい円を図形リストに追加
+                    lastCircle = circle;
                 }
 
                 // 更新を通知
                 setChanged();
                 notifyObservers();
-
-                // 円が画面外に出たら停止
             }
         });
         timer.start();
@@ -268,6 +291,10 @@ class ViewPanel extends JPanel implements Observer {
         for (Figure f : model.getFigures()) {
             f.draw(g);
         }
+        // キャッスルの HP を表示
+        int castleHP = model.getCastleHP();
+        g.setColor(Color.black);
+        g.drawString("Castle HP: " + castleHP, 10, 20);
     }
 
     public void reset() {
