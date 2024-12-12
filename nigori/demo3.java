@@ -247,7 +247,7 @@ class ViewPanel extends JPanel implements Observer {
         repaint();
 
         if (model.isCastle() && drawButton == null) {
-            drawButton = new JButton("Enable Drawing Mode");
+            drawButton = new JButton("Put Your Deffence...");
             drawButton.addActionListener(e -> {
                 enableDrawing = true; // 図形を描画するモードを有効化
                 drawButton.setEnabled(false); // ボタンを無効化
