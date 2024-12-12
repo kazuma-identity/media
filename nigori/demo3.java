@@ -222,6 +222,8 @@ class DrawModel extends Observable {
                 if (circleX + diameter < 0) {
                     lastCircle = null;
                     ((javax.swing.Timer) e.getSource()).stop();
+                    setChanged();
+                    notifyObservers("GameOver");
                 }
             }
         });
@@ -233,6 +235,7 @@ class DrawModel extends Observable {
 class ViewPanel extends JPanel implements Observer {
     protected DrawModel model;
     protected JButton choose1, choose2, choose3;
+    protected JButton gameOver;
     protected boolean enableDrawing = false;
 
     public ViewPanel(DrawModel m, DrawController c) {
@@ -255,6 +258,17 @@ class ViewPanel extends JPanel implements Observer {
     public void update(Observable o, Object arg) {
         repaint();
 
+        // 円が画面外に到達した際にボタンを生成
+        if (gameOver == null && "GameOver".equals(arg)) {
+            gameOver = new JButton("Game Over");
+            gameOver.addActionListener(e -> {
+                // スクリーン3に移動
+                ((CardLayout) this.getParent().getLayout()).show(this.getParent(), "Screen3");
+            });
+            this.add(gameOver);
+            this.revalidate();
+            this.repaint();
+        }
         if (model.isCastle() && choose1 == null) {
             choose1 = new JButton("RED");
             choose2 = new JButton("BLUE");
@@ -361,9 +375,21 @@ class DrawFrame extends JFrame {
         // コントローラーがビューを参照するように設定
         cont.view = screen2;
 
+        // スクリーン③（終了画面）
+        JPanel screen3 = new JPanel();
+        JLabel gameoverLabel = new JLabel("Game Over", SwingConstants.CENTER);
+        gameoverLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        JButton retryButton = new JButton("RETRY");
+        retryButton.addActionListener(e -> cardLayout.show(mainPanel, "Screen1"));
+
+        screen3.setLayout(new BorderLayout());
+        screen3.add(gameoverLabel, BorderLayout.CENTER);
+        screen3.add(retryButton, BorderLayout.SOUTH);        
+
         // スクリーンをカードとして追加
         mainPanel.add(screen1, "Screen1");
         mainPanel.add(screen2, "Screen2");
+        mainPanel.add(screen3, "Screen3");
 
         // 初期設定
         this.add(mainPanel);
