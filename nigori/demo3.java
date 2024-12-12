@@ -188,6 +188,18 @@ class DrawModel extends Observable {
         return isTouchingX && isTouchingY;
     }
 
+    public void reset() {
+        fig.clear(); // すべての図形を削除
+        drawingFigure = null; // 現在描画中の図形をリセット
+        currentColor = Color.black; // 色をリセット
+        Castle = false; // フラグをリセット
+        lastCircle = null; // 最後に描画した円をリセット
+        chosenFigure = null; // 選択した図形タイプをリセット
+
+        setChanged();
+        notifyObservers(); // モデルの変更を通知してビューを更新
+    }
+
 
     public void addMovingCircle() {
         javax.swing.Timer timer = new javax.swing.Timer(500, new ActionListener() { // 500ミリ秒ごとに実行
@@ -206,6 +218,15 @@ class DrawModel extends Observable {
                 circleX -= step;
                 CircleFigure circle = new CircleFigure(circleX, circleY - diameter / 2, diameter, Color.orange);
 
+                // 接触判定（最初の黒い四角形とのみ判定）
+                if (!fig.isEmpty() && isTouching(circle, fig.get(0))) { // 最初の図形と接触を確認
+                    checkCollisionAndRemoveC(circle);
+                    ((javax.swing.Timer) e.getSource()).stop(); // タイマーを停止
+                    setChanged();
+                    notifyObservers("GameOver"); // 衝突時に "GameOver" を通知
+                    return;
+                }
+
                 // 接触判定
                 if (!checkCollisionAndRemoveC(circle)) {
                     fig.add(circle);
@@ -219,12 +240,6 @@ class DrawModel extends Observable {
                 notifyObservers();
 
                 // 円が画面外に出たら停止
-                if (circleX + diameter < 0) {
-                    lastCircle = null;
-                    ((javax.swing.Timer) e.getSource()).stop();
-                    setChanged();
-                    notifyObservers("GameOver");
-                }
             }
         });
         timer.start();
@@ -253,6 +268,22 @@ class ViewPanel extends JPanel implements Observer {
         for (Figure f : model.getFigures()) {
             f.draw(g);
         }
+    }
+
+    public void reset() {
+        // すべてのコンポーネントを削除してリセット
+        this.removeAll();
+
+        // ボタンの参照をリセット
+        choose1 = null;
+        choose2 = null;
+        choose3 = null;
+        gameOver = null;
+
+        // 再描画
+        enableDrawing = false;
+        this.revalidate();
+        this.repaint();
     }
 
     public void update(Observable o, Object arg) {
@@ -380,7 +411,11 @@ class DrawFrame extends JFrame {
         JLabel gameoverLabel = new JLabel("Game Over", SwingConstants.CENTER);
         gameoverLabel.setFont(new Font("Arial", Font.BOLD, 24));
         JButton retryButton = new JButton("RETRY");
-        retryButton.addActionListener(e -> cardLayout.show(mainPanel, "Screen1"));
+        retryButton.addActionListener(e -> {
+            model.reset();
+            screen2.reset();
+            cardLayout.show(mainPanel, "Screen1");
+        });
 
         screen3.setLayout(new BorderLayout());
         screen3.add(gameoverLabel, BorderLayout.CENTER);
