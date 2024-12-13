@@ -231,11 +231,12 @@ class DrawModel extends Observable {
     }
 
     public void addMovingCircle() {
-        javax.swing.Timer timer = new javax.swing.Timer(500, new ActionListener() { // 500ミリ秒ごとに実行
+        javax.swing.Timer timer = new javax.swing.Timer(250, new ActionListener() { // 500ミリ秒ごとに実行
+            private Random rand = new Random();
             private int circleX = 480; // 右側の初期位置
-            private final int circleY = 240; // 中心位置
-            private final int diameter = 30; // 円の直径
-            private final int step = 20; // 移動距離
+            private int circleY = rand.nextInt(480); // 中心位置（ランダム初期化）
+            private final int diameter = 20; // 円の直径
+            private final int step = 40; // 移動距離
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -247,11 +248,18 @@ class DrawModel extends Observable {
                 circleX -= step;
                 CircleFigure circle = new CircleFigure(circleX, circleY - diameter / 2, diameter, Color.orange);
 
+                if (circleX + diameter < 0) {
+                    lastCircle = null;
+                    circleX = 480;
+                    circleY = rand.nextInt(480); // 円が画面外に到達したらY位置をランダムに変更
+                }
+
                 // 接触判定（キャッスルを含む全図形との衝突判定）
                 if (checkCollisionAndRemoveC(circle)) {
                     // 衝突してもゲームが継続する場合はリセットせず、次の円を生成
                     if (getCastleHP() > 0) {
                         circleX = 480; // 新しい円の初期位置を設定
+                        circleY = rand.nextInt(480); // 衝突時もY位置をランダムに変更
                     } else {
                         ((javax.swing.Timer) e.getSource()).stop(); // HPが0でタイマーを停止
                     }
@@ -267,6 +275,7 @@ class DrawModel extends Observable {
         });
         timer.start();
     }
+
 }
 
 // --- View ---
