@@ -8,6 +8,11 @@
 ```bash
 git clone https://github.com/kazuma-identity/media.git
 ```
+
+### リモートの状態をローカルに反映
+```bash
+git pull origin main
+```
 ### 変更のステージングとコミット
 
 1. 変更をステージング
@@ -29,5 +34,5 @@ git commit -m "変更内容の説明"
 ローカルの変更をリモートリポジトリに反映する
 
 ```bash
-git push origin ブランチ名
+git push origin main
 ```
