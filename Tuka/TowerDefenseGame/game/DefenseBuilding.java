@@ -1,4 +1,5 @@
-package game;
+package media.Tuka.TowerDefenseGame;
+// package game;
 
 import java.awt.Graphics;
 import java.awt.Color;

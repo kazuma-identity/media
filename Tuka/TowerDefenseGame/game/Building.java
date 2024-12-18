@@ -1,28 +1,23 @@
-package game;
+package media.Tuka.TowerDefenseGame;
+// package game;
 
 import java.awt.Graphics;
 
-public abstract class Unit implements GameObject {
+public abstract class Building implements GameObject {
     protected double x, y;
-    protected double speed;
-    protected int hp;
     protected int level;
     protected int cost;
 
-    public Unit(double x, double y, double speed, int cost) {
+    public Building(double x, double y, int cost) {
         this.x = x;
         this.y = y;
-        this.speed = speed;
         this.cost = cost;
         this.level = 1;
-        this.hp = 100; // 初期HP
     }
 
     // ゲッターとセッター
     public double getX() { return x; }
     public double getY() { return y; }
-    public int getHp() { return hp; }
-    public void damage(int amount) { hp -= amount; }
     public int getLevel() { return level; }
     public void upgrade() { level++; }
     public int getCost() { return cost; }
