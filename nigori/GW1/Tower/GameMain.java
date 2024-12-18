@@ -5,8 +5,13 @@ import javax.swing.JOptionPane;
 public class GameMain {
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
-      // プレイヤー名の入力
-      String playerName = JOptionPane.showInputDialog("プレイヤー名を入力してください:");
+      // プレイヤー名の入力 (タイトルを設定)
+      String playerName = JOptionPane.showInputDialog(
+        null, 
+        "プレイヤー名を入力してください:", 
+        "タワーディフェンスゲーム", // ダイアログのタイトル
+        JOptionPane.QUESTION_MESSAGE
+      );
       if (playerName == null || playerName.trim().isEmpty()) {
         JOptionPane.showMessageDialog(null, "プレイヤー名が無効です。ゲームを終了します。");
         System.exit(0);
@@ -44,3 +49,4 @@ public class GameMain {
     });
   }
 }
+
