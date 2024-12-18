@@ -5,7 +5,7 @@ import java.awt.Color;
 
 public class DefenseUnit extends Unit {
     public DefenseUnit(double x, double y) {
-        super(x, y, 0, 50);
+        super(x, y, 3, 10);
     }
 
     @Override
@@ -18,6 +18,10 @@ public class DefenseUnit extends Unit {
         // 防衛ユニットの描画（青の丸）
         g.setColor(Color.BLUE);
         g.fillOval((int)x - 8, (int)y - 8, 16, 16);
+
+        // レベル表示
+        g.setColor(Color.WHITE);
+        g.drawString("Lv " + level, (int)x - 10, (int)y + 5);
 
         // HPバーの描画
         g.setColor(Color.RED);
