@@ -3,24 +3,26 @@ package game;
 import java.awt.Graphics;
 
 public abstract class Building implements GameObject {
-    protected double x, y;
-    protected int level;
-    protected int health;
-    protected int cost;
+    protected double x, y; // 設置位置
+    protected int level; // レベル
+    protected int health; // 耐久値
+    protected int cost; // 必要コスト
+    protected int power; // 防衛：攻撃力　資源：資源獲得数
 
-    public Building(double x, double y, int cost, int health) {
+    public Building(double x, double y, int cost, int health, int power) {
         this.x = x;
         this.y = y;
         this.cost = cost;
         this.health = health;
         this.level = 1;
+        this.power = power;
     }
 
     // ゲッターとセッター
     public double getX() { return x; }
     public double getY() { return y; }
     public int getLevel() { return level; }
-    public void upgrade() { level++; }
+    public void levelup() { level++; }
     public int gethealth() { return health; }
     public int getCost() { return cost; }
 

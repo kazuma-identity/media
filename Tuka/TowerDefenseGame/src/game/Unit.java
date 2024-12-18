@@ -24,7 +24,7 @@ public abstract class Unit implements GameObject {
     public int getHp() { return hp; }
     public void damage(int amount) { hp -= amount; }
     public int getLevel() { return level; }
-    public void upgrade() { level++; }
+    public void levelup() { level++; }
     public int getCost() { return cost; }
 
     // 更新と描画の抽象メソッド

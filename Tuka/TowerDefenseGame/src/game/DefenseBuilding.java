@@ -7,13 +7,28 @@ import java.awt.Color;
 
 public class DefenseBuilding extends Building {
     public DefenseBuilding(double x, double y) {
-        super(x, y, 20, 300);
+        super(x, y, 20, 300, 20);
     }
 
-    // 攻撃可能か判定
+    // 与ダメージ処理
+    public int getAttackPower() {
+        return power * level;
+    }
+
+    // 被ダメージ処理
+    public void takeDamage(int damage) {
+        health -= damage;
+        if(health<0) { health = 0; }
+    }
+
+    // 被破壊判定
+    public boolean isDead() {
+        return health<=0;
+    }
+
+    // 攻撃可能判定
     public boolean CanAttack(double x, double y) {
-        if(x*x+y*y<2500) { return true; }
-        else             { return false; }
+        return x*x+y*y<2500;
     }
 
     @Override

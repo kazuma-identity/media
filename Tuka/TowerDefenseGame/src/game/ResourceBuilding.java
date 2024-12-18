@@ -9,7 +9,7 @@ import java.awt.Graphics;
 
 public class ResourceBuilding extends Building {
     public ResourceBuilding(double x, double y) {
-        super(x, y, 15, 50);
+        super(x, y, 15, 50, 5);
     }
 
     @Override
@@ -17,9 +17,9 @@ public class ResourceBuilding extends Building {
         // 1秒ごとにHPが1減少
         health -= deltaTime * 1;
 
-        // 10秒ごとに資源を5獲得
+        // 10秒ごとに資源をpowerの数だけ獲得
         if(deltaTime%10==0) {
-//            gameresource += 5;
+//            gameresource += power;
         }
     }
 
