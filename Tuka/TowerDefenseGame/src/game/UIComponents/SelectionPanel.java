@@ -1,4 +1,4 @@
-package media.Tuka.TowerDefenseGame;
+package game.UIComponents;
 
 import java.awt.GridLayout;
 

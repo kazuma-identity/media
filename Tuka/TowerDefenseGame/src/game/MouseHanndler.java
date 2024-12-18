@@ -1,4 +1,4 @@
-package media.Tuka.TowerDefenseGame;
+package game;
 
 public class MouseHanndler {
     
