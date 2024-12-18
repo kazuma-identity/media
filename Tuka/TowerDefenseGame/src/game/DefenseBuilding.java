@@ -6,8 +6,11 @@ import java.awt.Graphics;
 import java.awt.Color;
 
 public class DefenseBuilding extends Building {
-    public DefenseBuilding(double x, double y) {
-        super(x, y, 20, 300, 20);
+    private int range = 30;
+
+    public DefenseBuilding(double x, double y, int cost, int health, int power, int range) {
+        super(x, y, cost, health, power);
+        this.range = range;
     }
 
     // 与ダメージ処理
@@ -28,9 +31,23 @@ public class DefenseBuilding extends Building {
 
     // 攻撃可能判定
     public boolean CanAttack(double x, double y) {
-        return x*x+y*y<2500;
+        return x*x+y*y<range*range;
     }
 
+    // レベル処理
+    public void levelprc(int level) {
+        switch(level) {
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+        }
+    }
+    // 更新
     @Override
     public void update(double deltaTime) {
         // クライアント側では特に処理なし
@@ -59,6 +76,6 @@ public class DefenseBuilding extends Building {
     public void drawRange(Graphics g) {
         Color clr1 = new Color(255, 0, 0, 25);
         g.setColor(clr1);
-        g.fillOval((int)x-25, (int)y-25, 50, 50);
+        g.fillOval((int)x-25, (int)y-25, range*2, range*2);
     }
 }
