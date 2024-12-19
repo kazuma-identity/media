@@ -1,21 +1,15 @@
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.JOptionPane;
+import javax.swing.*;
+import java.awt.*;
 
 public class GameMain {
   public static void main(String[] args) {
     SwingUtilities.invokeLater(() -> {
-      // プレイヤー名の入力 (タイトルを設定)
-      String playerName = JOptionPane.showInputDialog(
-        null, 
-        "プレイヤー名を入力してください:", 
-        "タワーディフェンスゲーム", // ダイアログのタイトル
-        JOptionPane.QUESTION_MESSAGE
-      );
+      // プレイヤー名入力用のカスタムダイアログ
+      String playerName = showCustomInputDialog();
       if (playerName == null || playerName.trim().isEmpty()) {
         JOptionPane.showMessageDialog(null, "プレイヤー名が無効です。ゲームを終了します。");
         System.exit(0);
-      }
+      }    
 
       // プレイヤーとボットの作成
       Player player = new Player(playerName, 100);
@@ -47,6 +41,50 @@ public class GameMain {
       frame.setLocationRelativeTo(null);
       frame.setVisible(true);
     });
+  }
+
+  private static String showCustomInputDialog() {
+    // ダイアログの作成
+    JDialog dialog = new JDialog((Frame) null, "タワーディフェンスゲーム", true);
+    dialog.setLayout(new BorderLayout());
+    dialog.setSize(300, 200);
+    dialog.setLocationRelativeTo(null);
+
+    // メッセージと入力フィールド
+    JLabel messageLabel = new JLabel("プレイヤー名を入力してください:");
+    JTextField textField = new JTextField(20);
+    textField.setPreferredSize(new Dimension(200, textField.getFontMetrics(textField.getFont()).getHeight() + 10));
+    JPanel inputPanel = new JPanel();
+    inputPanel.setLayout(new FlowLayout(FlowLayout.CENTER)); // コンパクトに配置
+    inputPanel.add(messageLabel);
+    inputPanel.add(textField);
+
+    // ボタンの作成
+    JButton okButton = new JButton("ゲーム開始");
+    JButton cancelButton = new JButton("ゲーム終了");
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.add(okButton);
+    buttonPanel.add(cancelButton);
+
+    // ダイアログに追加
+    dialog.add(inputPanel, BorderLayout.CENTER);
+    dialog.add(buttonPanel, BorderLayout.SOUTH);
+
+    // ボタンの動作
+    final String[] result = {null};
+    okButton.addActionListener(e -> {
+      result[0] = textField.getText().trim();
+      dialog.dispose();
+    });
+    cancelButton.addActionListener(e -> {
+      result[0] = null;
+      dialog.dispose();
+    });
+
+    // ダイアログの表示
+    dialog.setVisible(true);
+
+    return result[0];
   }
 }
 

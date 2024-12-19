@@ -4,15 +4,17 @@ import java.awt.Color;
 import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JOptionPane;
 import javax.swing.Timer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
 
 public class GamePanel extends JPanel {
   private Game game;
   private String selectedAction = null; // "BuildResource", "BuildDefense", "DeploySiege", "DeployDefense"
   private Timer gameTimer;
+  private String temporaryMessage = null; // 一時的なメッセージ
+  private long messageDisplayStartTime = 0; // メッセージの表示開始時刻
 
   public GamePanel() {
     setBackground(Color.BLACK);
@@ -37,7 +39,7 @@ public class GamePanel extends JPanel {
           return;
 
         if (!isWithinTerritory(currentPlayer, x, y)) {
-          JOptionPane.showMessageDialog(null, "自分の陣地内にのみ建物やユニットを配置できます。");
+          showTemporaryMessage("自分の陣地内にのみ建物やユニットを配置できます。");
           return;
         }
 
@@ -74,8 +76,6 @@ public class GamePanel extends JPanel {
   }
 
   private boolean isWithinTerritory(Player player, double x, double y) {
-    // 自分の陣地内にのみ建物やユニットを配置できるように判定
-    // マップは横長で左右に陣地がある
     if (player.getCastle().getX() < 400) { // 左側プレイヤー
       return x <= 400;
     } else { // 右側プレイヤー
@@ -100,7 +100,7 @@ public class GamePanel extends JPanel {
       player.addBuilding(building);
       repaint();
     } else {
-      JOptionPane.showMessageDialog(null, "資源が不足しています。");
+      showTemporaryMessage("資源が不足しています。");
     }
   }
 
@@ -122,12 +122,26 @@ public class GamePanel extends JPanel {
       game.addUnit(unit);
       repaint();
     } else {
-      JOptionPane.showMessageDialog(null, "資源が不足しています。");
+      showTemporaryMessage("資源が不足しています。");
     }
   }
 
   public void setSelectedAction(String action) {
     this.selectedAction = action;
+  }
+
+  private void showTemporaryMessage(String message) {
+    temporaryMessage = message;
+    messageDisplayStartTime = System.currentTimeMillis();
+
+    // 3秒後にメッセージを消す
+    Timer timer = new Timer(3000, e -> {
+      temporaryMessage = null;
+      repaint();
+    });
+    timer.setRepeats(false);
+    timer.start();
+    repaint();
   }
 
   @Override
@@ -139,27 +153,24 @@ public class GamePanel extends JPanel {
       Player player = game.getPlayer();
       Player bot = game.getBot();
 
-      // プレイヤーの資源表示
       g.setColor(Color.WHITE);
       g.drawString(player.getName() + " 資源: " + player.getResources(), 10, 20);
       g.setColor(Color.GREEN);
-      int playerMaxResources = 200; // 資源の最大値（スケーリング用）
+      int playerMaxResources = 200;
       int playerResourceWidth = Math.min(player.getResources(), playerMaxResources);
       g.fillRect(100, 10, playerResourceWidth, 10);
       g.setColor(Color.GRAY);
       g.drawRect(100, 10, playerMaxResources, 10);
 
-      // ボットの資源表示
       g.setColor(Color.WHITE);
       g.drawString(bot.getName() + " 資源: " + bot.getResources(), 650, 20);
       g.setColor(Color.GREEN);
-      int botMaxResources = 200; // 資源の最大値（スケーリング用）
+      int botMaxResources = 200;
       int botResourceWidth = Math.min(bot.getResources(), botMaxResources);
       g.fillRect(650, 10, botResourceWidth, 10);
       g.setColor(Color.GRAY);
       g.drawRect(650, 10, botMaxResources, 10);
 
-      // 城の描画
       for (Player p : game.getPlayers()) {
         if (p.getName().equals("Bot")) {
           p.getCastle().draw(g, Color.RED);
@@ -168,27 +179,29 @@ public class GamePanel extends JPanel {
         }
       }
 
-      // 建物の描画
       for (Player p : game.getPlayers()) {
         for (Building building : p.getBuildings()) {
           building.draw(g);
-          // 各建物のレベルを表示
           g.setColor(Color.WHITE);
           g.drawString("Lv " + building.getLevel(), (int) building.getX() - 10, (int) building.getY() + 25);
         }
       }
 
-      // ユニットの描画
       for (Player p : game.getPlayers()) {
         for (Unit unit : p.getUnits()) {
           unit.draw(g);
         }
       }
 
-      // プロジェクタイルの描画
       for (Projectile p : game.getProjectiles()) {
         p.draw(g);
       }
+    }
+
+    // 一時的なメッセージを表示
+    if (temporaryMessage != null) {
+      g.setColor(Color.YELLOW);
+      g.drawString(temporaryMessage, getWidth() / 2 - 50, getHeight() - 30);
     }
   }
 
