@@ -120,7 +120,7 @@ public class GamePanel extends JPanel {
             player.addBuilding(building);
             repaint();
         } else {
-            showTemporaryMessage("資源が不足しています", 20); // 表示メッセージの追加
+            showTemporaryMessage("資源が不足しています。", 20); // 表示メッセージの追加
         }
     }
 
@@ -142,7 +142,7 @@ public class GamePanel extends JPanel {
             game.addUnit(unit);
             repaint();
         } else {
-            showTemporaryMessage("資源が不足しています", 20); // 表示メッセージの追加
+            showTemporaryMessage("資源が不足しています。", 20); // 表示メッセージの追加
         }
     }
 
@@ -229,4 +229,11 @@ public class GamePanel extends JPanel {
         JOptionPane.showMessageDialog(this, "ゲーム終了！勝者: " + winner);
         System.exit(0);
     }
+
+    public void updateFromServer(String gameState) {
+        Game updatedGame = Game.fromString(gameState);
+        this.setGame(updatedGame);
+        repaint();
+    }
+
 }

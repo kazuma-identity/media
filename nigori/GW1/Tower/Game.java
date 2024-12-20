@@ -2,139 +2,189 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class Game {
-  private Player player;
-  private Player bot;
-  private List<Unit> units;
-  private List<Projectile> projectiles;
-  private GamePanel gamePanel;
+    private Player player;
+    private Player bot;
+    private List<Unit> units;
+    private List<Projectile> projectiles;
+    private GamePanel gamePanel;
 
-  // 基礎資源生成速度（資源/秒）
-  private final double baseResourceRate = 40.0;
+    // 基礎資源生成速度（資源/秒）
+    private final double baseResourceRate = 40.0;
 
-  public Game() {
-    units = new ArrayList<>();
-    projectiles = new ArrayList<>();
-  }
-
-  public void setPlayers(Player player, Player bot) {
-    this.player = player;
-    this.bot = bot;
-  }
-
-  public Player getPlayer() {
-    return player;
-  }
-
-  public Player getBot() {
-    return bot;
-  }
-
-  public List<Unit> getUnits() {
-    return units;
-  }
-
-  public List<Projectile> getProjectiles() {
-    return projectiles;
-  }
-
-  public void addUnit(Unit unit) {
-    units.add(unit);
-  }
-
-  public void removeUnit(Unit unit) {
-    units.remove(unit);
-  }
-
-  public void addProjectile(Projectile p) {
-    projectiles.add(p);
-  }
-
-  public void removeProjectile(Projectile p) {
-    projectiles.remove(p);
-  }
-
-  public Player getOpponent(Unit unit) {
-    if (unit == null)
-      return null;
-    if (player.getUnits().contains(unit)) {
-      return bot;
-    } else if (bot.getUnits().contains(unit)) {
-      return player;
-    }
-    return null;
-  }
-
-  public List<Player> getPlayers() {
-    List<Player> players = new ArrayList<>();
-    players.add(player);
-    players.add(bot);
-    return players;
-  }
-
-  public void setGamePanel(GamePanel panel) {
-    this.gamePanel = panel;
-  }
-
-  public void update(double deltaTime) {
-    // 基礎資源生成の更新
-    player.addResources((int) (baseResourceRate * deltaTime));
-    bot.addResources((int) (baseResourceRate * deltaTime));
-
-    // 資源施設による追加資源生成
-    for (Building building : player.getBuildings()) {
-      if (building instanceof ResourceBuilding) {
-        player.addResources((int) (1.5 * baseResourceRate * deltaTime));
-      }
+    public Game() {
+        units = new ArrayList<>();
+        projectiles = new ArrayList<>();
     }
 
-    for (Building building : bot.getBuildings()) {
-      if (building instanceof ResourceBuilding) {
-        bot.addResources((int) (1.5 * baseResourceRate * deltaTime));
-      }
+    public void setPlayers(Player player, Player bot) {
+        this.player = player;
+        this.bot = bot;
     }
 
-    // 建物の更新
-    for (Building building : player.getBuildings()) {
-      building.update(deltaTime, this);
+    public Player getPlayer() {
+        return player;
     }
 
-    for (Building building : bot.getBuildings()) {
-      building.update(deltaTime, this);
+    public Player getBot() {
+        return bot;
     }
 
-    // ユニットの更新
-    for (Unit unit : new ArrayList<>(units)) { // コピーリストを使用してConcurrentModificationExceptionを防ぐ
-      unit.update(deltaTime, this);
+    public List<Unit> getUnits() {
+        return units;
     }
 
-    // プロジェクタイルの更新
-    for (Projectile p : new ArrayList<>(projectiles)) {
-      p.update(deltaTime, this);
-      if (!p.isActive()) {
-        removeProjectile(p);
-      }
+    public List<Projectile> getProjectiles() {
+        return projectiles;
     }
 
-    // 勝敗判定
-    if (player.getCastle().getHp() <= 0) {
-      if (gamePanel != null) {
-        gamePanel.showGameOver(bot.getName());
-      }
+    public void addUnit(Unit unit) {
+        units.add(unit);
     }
 
-    if (bot.getCastle().getHp() <= 0) {
-      if (gamePanel != null) {
-        gamePanel.showGameOver(player.getName());
-      }
+    public void removeUnit(Unit unit) {
+        units.remove(unit);
     }
-  }
 
-  // 画面サイズに基づいてユニットが陣地内にいるか判定
-  public boolean isWithinTerritory(Player player, double x, double y) {
-    if (player.getCastle().getX() < 400) { // 左側プレイヤー
-      return x <= 400;
-    } else { // 右側プレイヤー
-      return x >= 400;
+    public void addProjectile(Projectile p) {
+        projectiles.add(p);
     }
-  }
+
+    public void removeProjectile(Projectile p) {
+        projectiles.remove(p);
+    }
+
+    public Player getOpponent(Unit unit) {
+        if (unit == null)
+            return null;
+        if (player.getUnits().contains(unit)) {
+            return bot;
+        } else if (bot.getUnits().contains(unit)) {
+            return player;
+        }
+        return null;
+    }
+
+    public List<Player> getPlayers() {
+        List<Player> players = new ArrayList<>();
+        players.add(player);
+        players.add(bot);
+        return players;
+    }
+
+    public void setGamePanel(GamePanel panel) {
+        this.gamePanel = panel;
+    }
+
+    public void update(double deltaTime) {
+        // 基礎資源生成の更新
+        player.addResources((int) (baseResourceRate * deltaTime));
+        bot.addResources((int) (baseResourceRate * deltaTime));
+
+        // 資源施設による追加資源生成
+        for (Building building : player.getBuildings()) {
+            if (building instanceof ResourceBuilding) {
+                player.addResources((int) (1.5 * baseResourceRate * deltaTime));
+            }
+        }
+
+        for (Building building : bot.getBuildings()) {
+            if (building instanceof ResourceBuilding) {
+                bot.addResources((int) (1.5 * baseResourceRate * deltaTime));
+            }
+        }
+
+        // 建物の更新
+        for (Building building : player.getBuildings()) {
+            building.update(deltaTime, this);
+        }
+
+        for (Building building : bot.getBuildings()) {
+            building.update(deltaTime, this);
+        }
+
+        // ユニットの更新
+        for (Unit unit : new ArrayList<>(units)) { // コピーリストを使用してConcurrentModificationExceptionを防ぐ
+            unit.update(deltaTime, this);
+        }
+
+        // プロジェクタイルの更新
+        for (Projectile p : new ArrayList<>(projectiles)) {
+            p.update(deltaTime, this);
+            if (!p.isActive()) {
+                removeProjectile(p);
+            }
+        }
+
+        // 勝敗判定
+        if (player.getCastle().getHp() <= 0) {
+            if (gamePanel != null) {
+                gamePanel.showGameOver(bot.getName());
+            }
+        }
+
+        if (bot.getCastle().getHp() <= 0) {
+            if (gamePanel != null) {
+                gamePanel.showGameOver(player.getName());
+            }
+        }
+    }
+
+    // 画面サイズに基づいてユニットが陣地内にいるか判定
+    public boolean isWithinTerritory(Player player, double x, double y) {
+        if (player.getCastle().getX() < 400) { // 左側プレイヤー
+            return x <= 400;
+        } else { // 右側プレイヤー
+            return x >= 400;
+        }
+    }
+
+    // ゲーム状態を文字列に変換
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(player.getName()).append(":").append(player.getResources()).append(";");
+        sb.append(bot.getName()).append(":").append(bot.getResources()).append(";");
+        return sb.toString();
+    }
+
+    // 文字列からゲーム状態を復元
+    public static Game fromString(String gameState) {
+        Game game = new Game();
+        String[] playerStates = gameState.split(";");
+        for (String playerState : playerStates) {
+            if (playerState.isEmpty()) continue;
+
+            String[] parts = playerState.split(":");
+            if (parts.length == 2) {
+                String playerName = parts[0];
+                int resources = Integer.parseInt(parts[1]);
+
+                Player player = new Player(playerName, resources);
+                if (playerName.equals("Player1")) {
+                    game.player = player;
+                } else if (playerName.equals("Player2")) {
+                    game.bot = player;
+                }
+            }
+        }
+        return game;
+    }
+
+    public void updateFromString(String gameState) {
+        String[] playerStates = gameState.split(";");
+        for (String playerState : playerStates) {
+            if (playerState.isEmpty()) continue;
+
+            String[] parts = playerState.split(":");
+            if (parts.length == 2) {
+                String playerName = parts[0];
+                int resources = Integer.parseInt(parts[1]);
+
+                if (player.getName().equals(playerName)) {
+                    player.setResources(resources);
+                } else if (bot.getName().equals(playerName)) {
+                    bot.setResources(resources);
+                }
+            }
+        }
+    }
 }

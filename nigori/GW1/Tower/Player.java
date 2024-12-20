@@ -15,6 +15,10 @@ public class Player {
     units = new ArrayList<>();
   }
 
+  public void setResources(int resources) {
+    this.resources = resources;
+  }
+
   public String getName() {
     return name;
   }
