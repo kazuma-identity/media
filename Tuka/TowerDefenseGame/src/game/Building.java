@@ -8,14 +8,16 @@ public abstract class Building implements GameObject {
     protected int health; // 耐久値
     protected int cost; // 必要コスト
     protected int power; // 防衛：攻撃力　資源：資源獲得数
+    protected Player owner; // 建物の所有者
 
-    public Building(double x, double y, int cost, int health, int power) {
+    public Building(double x, double y, int cost, int health, int power, Player owner) {
         this.x = x;
         this.y = y;
         this.cost = cost;
         this.health = health;
         this.level = 1;
         this.power = power;
+        this.owner = owner;
     }
 
     // ゲッターとセッター
@@ -25,6 +27,8 @@ public abstract class Building implements GameObject {
     public void levelup() { level++; }
     public int gethealth() { return health; }
     public int getCost() { return cost; }
+    public int getPower() { return power; }
+    public Player getPlayer() { return owner; }
 
     // 更新と描画の抽象メソッド
     @Override

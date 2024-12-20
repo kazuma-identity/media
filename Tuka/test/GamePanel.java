@@ -29,8 +29,8 @@ public class GamePanel extends JPanel {
         if (selectedAction == null)
           return;
 
-        double x = e.getX();
-        double y = e.getY();
+        double x = (e.getX() / 30) * 30 + 15;
+        double y = (e.getY() / 30) * 30 + 15;
 
         Player currentPlayer = game.getPlayer();
         if (currentPlayer == null)
