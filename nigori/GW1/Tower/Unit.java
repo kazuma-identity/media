@@ -45,6 +45,10 @@ public abstract class Unit {
     return owner;
   }
 
+  public int getLevel() {
+    return level;
+  }
+
   // ダメージを受ける
   public void damage(int amount) {
     hp -= amount;

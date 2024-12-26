@@ -37,14 +37,13 @@ public class GameServer {
     }
 
     private static void processClientAction(Game game, Player player, String action) {
-        // クライアントからの指示に基づいてゲーム状態を更新
-        // メッセージ例: "Build:RESOURCE:200:300"
         String[] parts = action.split(":");
-        if (parts.length == 4) {
+        if (parts.length >= 4) {
             String command = parts[0];
             String type = parts[1];
             double x = Double.parseDouble(parts[2]);
             double y = Double.parseDouble(parts[3]);
+            int level = parts.length == 5 ? Integer.parseInt(parts[4]) : 1;
 
             if (command.equals("Build")) {
                 if (type.equals("RESOURCE")) {
@@ -61,6 +60,7 @@ public class GameServer {
             }
         }
     }
+
 
     private static String serializeGameState(Game game) {
         // ゲーム状態を文字列に変換
